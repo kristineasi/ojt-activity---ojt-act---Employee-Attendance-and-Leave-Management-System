@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email", "department", "role", "role_label"]
+        fields = ["id", "username", "first_name", "last_name", "email", "department", "hourly_rate", "role", "role_label"]
 
     def get_role_label(self, obj):
         return "Admin" if obj.role == User.Role.MANAGER else "Employee"
@@ -20,7 +20,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "password", "first_name", "last_name", "email", "department", "role"]
+        fields = ["username", "password", "first_name", "last_name", "email", "department", "hourly_rate", "role"]
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
@@ -31,7 +31,7 @@ class EmployeeAccountCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["username", "password", "first_name", "last_name", "email", "department"]
+        fields = ["username", "password", "first_name", "last_name", "email", "department", "hourly_rate"]
 
     def create(self, validated_data):
         return User.objects.create_user(

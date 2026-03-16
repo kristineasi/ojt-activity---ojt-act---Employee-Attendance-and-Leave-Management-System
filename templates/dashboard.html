@@ -102,8 +102,34 @@
                 <input type="text" name="last_name" placeholder="Last name" required>
                 <input type="email" name="email" placeholder="Email (optional)">
                 <input type="text" name="department" placeholder="Department (optional)">
+                <input type="number" name="hourly_rate" placeholder="Hourly rate" min="0" step="0.01" required>
                 <button type="submit">Create Employee Account</button>
             </form>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Salary Summary</h2>
+                    <p>Manual payroll is calculated from each employee's logged time-in and time-out records for the selected month.</p>
+                </div>
+                <div class="section-icon">PY</div>
+            </div>
+            <div id="salary-summary" class="summary">Loading salary summary...</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Rate</th>
+                            <th>Regular Hrs</th>
+                            <th>OT Hrs</th>
+                            <th>Total Pay</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salary-rows"></tbody>
+                </table>
+            </div>
         </section>
     </main>
 </div>

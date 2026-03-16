@@ -35,6 +35,7 @@ class Command(BaseCommand):
                 "first_name": "J",
                 "last_name": "Robles",
                 "email": "jrobles@example.com",
+                "hourly_rate": "120.00",
             },
             {
                 "username": "aarceta",
@@ -42,6 +43,7 @@ class Command(BaseCommand):
                 "first_name": "A",
                 "last_name": "Arceta",
                 "email": "aarceta@example.com",
+                "hourly_rate": "115.00",
             },
             {
                 "username": "mlim",
@@ -49,6 +51,7 @@ class Command(BaseCommand):
                 "first_name": "M",
                 "last_name": "Lim",
                 "email": "mlim@example.com",
+                "hourly_rate": "125.00",
             },
             {
                 "username": "cvergara",
@@ -56,6 +59,7 @@ class Command(BaseCommand):
                 "first_name": "C",
                 "last_name": "Vergara",
                 "email": "cvergara@example.com",
+                "hourly_rate": "118.00",
             },
         ]
 

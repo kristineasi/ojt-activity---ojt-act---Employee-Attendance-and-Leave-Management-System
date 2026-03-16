@@ -9,8 +9,8 @@ from .models import User
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    fieldsets = UserAdmin.fieldsets + (("Profile", {"fields": ("role", "department")}),)
-    add_fieldsets = UserAdmin.add_fieldsets + (("Profile", {"fields": ("first_name", "last_name", "email", "role", "department")}),)
-    list_display = ("username", "email", "first_name", "last_name", "role", "department", "is_staff")
+    fieldsets = UserAdmin.fieldsets + (("Profile", {"fields": ("role", "department", "hourly_rate")}),)
+    add_fieldsets = UserAdmin.add_fieldsets + (("Profile", {"fields": ("first_name", "last_name", "email", "role", "department", "hourly_rate")}),)
+    list_display = ("username", "email", "first_name", "last_name", "role", "department", "hourly_rate", "is_staff")
     list_filter = ("role", "department", "is_staff")
     search_fields = ("username", "first_name", "last_name", "email", "department")

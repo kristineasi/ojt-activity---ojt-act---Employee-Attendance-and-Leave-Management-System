@@ -10,6 +10,8 @@ const attendanceActions = document.querySelector(".actions");
 const employeeAccountPanel = document.getElementById("employee-account-panel");
 const employeeAccountForm = document.getElementById("employee-account-form");
 const employeeAccountNote = document.getElementById("employee-account-note");
+const salarySummaryNode = document.getElementById("salary-summary");
+const salaryRows = document.getElementById("salary-rows");
 
 let currentUser = null;
 
@@ -48,6 +50,11 @@ function formatDateTime(value) {
 
 function statusTag(status) {
     return `<span class="tag ${status}">${status}</span>`;
+}
+
+function formatMoney(value) {
+    const amount = Number(value || 0);
+    return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function renderAttendance(rows) {
@@ -162,10 +169,48 @@ async function loadLeaves() {
     renderLeaves(records);
 }
 
+function renderSalaryRows(rows) {
+    if (!rows.length) {
+        salaryRows.innerHTML = "<tr><td colspan='5'>No salary records for this month yet.</td></tr>";
+        return;
+    }
+
+    salaryRows.innerHTML = rows
+        .map(
+            (row) => `
+            <tr>
+                <td>${row.employee_name || "N/A"}</td>
+                <td>${formatMoney(row.hourly_rate)}</td>
+                <td>${row.regular_hours}</td>
+                <td>${row.overtime_hours}</td>
+                <td>${formatMoney(row.total_pay)}</td>
+            </tr>
+        `
+        )
+        .join("");
+}
+
+async function loadSalarySummary() {
+    const data = await api("/api/attendance/salary-summary/");
+    const isAdmin = currentUser?.role === "manager";
+
+    if (isAdmin) {
+        renderSalaryRows(data.employees || []);
+        salarySummaryNode.textContent = `Manual payroll this month: total regular pay ${formatMoney(data.totals?.regular_pay)}, overtime pay ${formatMoney(data.totals?.overtime_pay)}, combined pay ${formatMoney(data.totals?.total_pay)}.`;
+        return;
+    }
+
+    const employee = data.employee;
+    renderSalaryRows(employee ? [employee] : []);
+    salarySummaryNode.textContent = employee
+        ? `Your manual salary this month is ${formatMoney(employee.total_pay)} based on ${employee.regular_hours} regular hour(s) and ${employee.overtime_hours} overtime hour(s).`
+        : "No salary records for this month yet.";
+}
+
 async function safeRefresh() {
     try {
         await loadProfile();
-        await Promise.all([loadAttendance(), loadLeaves()]);
+        await Promise.all([loadAttendance(), loadLeaves(), loadSalarySummary()]);
     } catch (error) {
         alert(error.message);
     }
@@ -217,6 +262,9 @@ employeeAccountForm?.addEventListener("submit", async (event) => {
     if (!payload.department) {
         delete payload.department;
     }
+    if (!payload.hourly_rate) {
+        delete payload.hourly_rate;
+    }
 
     try {
         await api("/api/accounts/employees/create/", {
@@ -225,6 +273,7 @@ employeeAccountForm?.addEventListener("submit", async (event) => {
         });
         employeeAccountForm.reset();
         alert("Employee account created successfully.");
+        await loadSalarySummary();
     } catch (error) {
         alert(error.message);
     }
