@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-shell">
+    <div class="auth-card">
+        <h1>WorkPulse</h1>
+        <p>Employee Attendance and Leave Management System</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="notice error">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required>
+
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

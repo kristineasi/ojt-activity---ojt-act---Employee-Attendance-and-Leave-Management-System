@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="app-shell">
+    <header class="topbar">
+        <div>
+            <h1>WorkPulse Dashboard</h1>
+            <p id="user-meta">Loading profile...</p>
+        </div>
+        <form method="post" action="/logout/">
+            {% csrf_token %}
+            <button class="ghost" type="submit">Logout</button>
+        </form>
+    </header>
+
+    <main class="dashboard-grid">
+        <section class="panel">
+            <h2>Attendance</h2>
+            <div class="actions">
+                <button id="time-in-btn">Time In</button>
+                <button id="time-out-btn" class="secondary">Time Out</button>
+            </div>
+            <div id="attendance-summary" class="summary"></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
+                            <th>Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-rows"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Leave Requests</h2>
+            <form id="leave-form" class="leave-form">
+                <select name="leave_type" required>
+                    <option value="">Leave Type</option>
+                    <option value="vacation">Vacation</option>
+                    <option value="sick">Sick</option>
+                    <option value="emergency">Emergency</option>
+                    <option value="unpaid">Unpaid</option>
+                </select>
+                <input type="date" name="start_date" required>
+                <input type="date" name="end_date" required>
+                <textarea name="reason" rows="2" placeholder="Reason" required></textarea>
+                <button type="submit">File Leave</button>
+            </form>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Type</th>
+                            <th>Dates</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leave-rows"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}
