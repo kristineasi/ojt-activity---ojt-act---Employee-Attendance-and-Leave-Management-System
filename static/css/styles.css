@@ -241,6 +241,18 @@ textarea:focus {
     grid-column: span 6;
 }
 
+.dashboard-grid.employee-layout {
+    grid-template-columns: 1fr;
+}
+
+.dashboard-grid.employee-layout > .panel {
+    grid-column: 1 / -1;
+}
+
+.dashboard-grid.employee-layout #salary-panel {
+    grid-column: 1 / -1;
+}
+
 #salary-panel {
     grid-column: 1 / -1;
     width: 100%;

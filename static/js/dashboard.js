@@ -14,6 +14,7 @@ const salarySummaryNode = document.getElementById("salary-summary");
 const salaryRows = document.getElementById("salary-rows");
 const profileForm = document.getElementById("profile-form");
 const profileNote = document.getElementById("profile-note");
+const dashboardGrid = document.querySelector(".dashboard-grid");
 
 let currentUser = null;
 
@@ -153,6 +154,16 @@ function updateProfileSection() {
     }
 }
 
+function applyRoleLayout() {
+    if (!dashboardGrid) {
+        return;
+    }
+
+    const isAdmin = currentUser?.role === "manager";
+    dashboardGrid.classList.toggle("admin-layout", isAdmin);
+    dashboardGrid.classList.toggle("employee-layout", !isAdmin);
+}
+
 function hydrateProfileForm() {
     if (!profileForm || !currentUser) {
         return;
@@ -169,6 +180,7 @@ function hydrateProfileForm() {
 async function loadProfile() {
     currentUser = await api("/api/accounts/me/");
     userMetaNode.textContent = `${currentUser.first_name || currentUser.username} - ${(currentUser.role_label || currentUser.role).toUpperCase()} | ${currentUser.department || "No department"}`;
+    applyRoleLayout();
     updateAttendanceSection();
     updateLeaveSection();
     updateEmployeeAccountSection();
