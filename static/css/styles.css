@@ -111,8 +111,9 @@ button.ghost {
 }
 
 .auth-card h1 {
-    font-size: 2.15rem;
+    font-size: 2rem;
     letter-spacing: -0.03em;
+    line-height: 1.22;
 }
 
 .auth-card p {
@@ -201,12 +202,13 @@ textarea:focus {
 }
 
 .topbar h1 {
-    font-size: clamp(1.9rem, 3vw, 2.65rem);
+    font-size: clamp(1.7rem, 2.7vw, 2.3rem);
     letter-spacing: -0.04em;
+    line-height: 1.25;
 }
 
 .topbar-copy {
-    max-width: 650px;
+    max-width: 760px;
 }
 
 .topbar-copy p:first-child {
