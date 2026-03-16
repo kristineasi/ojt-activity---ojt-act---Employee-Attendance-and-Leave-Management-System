@@ -1,16 +1,12 @@
-from datetime import datetime, timedelta
-from decimal import Decimal
-
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from apps.attendance.models import AttendanceRecord
 from apps.leaves.models import LeaveRequest
 
 
 class Command(BaseCommand):
-    help = "Create one-click demo manager/employee data with attendance and leave records."
+    help = "Create one-click manager and employee accounts with clean attendance and leave records."
 
     def handle(self, *args, **options):
         user_model = get_user_model()
@@ -80,45 +76,11 @@ class Command(BaseCommand):
             employee.save()
             seeded_employees.append((employee, password))
 
-        today = timezone.localdate()
-        yesterday = today - timedelta(days=1)
+        seeded_users = [manager, *(employee for employee, _ in seeded_employees)]
+        AttendanceRecord.objects.filter(employee__in=seeded_users).delete()
+        LeaveRequest.objects.filter(employee__in=seeded_users).delete()
 
-        for index, (employee, _) in enumerate(seeded_employees):
-            AttendanceRecord.objects.update_or_create(
-                employee=employee,
-                date=yesterday,
-                defaults={
-                    "time_in": timezone.make_aware(datetime.combine(yesterday, datetime.min.time().replace(hour=9))),
-                    "time_out": timezone.make_aware(datetime.combine(yesterday, datetime.min.time().replace(hour=17))),
-                    "worked_hours": Decimal("8.00"),
-                },
-            )
-
-            AttendanceRecord.objects.update_or_create(
-                employee=employee,
-                date=today,
-                defaults={
-                    "time_in": timezone.now() - timedelta(hours=2 + index),
-                    "time_out": None,
-                    "worked_hours": Decimal("0.00"),
-                },
-            )
-
-            LeaveRequest.objects.update_or_create(
-                employee=employee,
-                start_date=today + timedelta(days=2 + index),
-                end_date=today + timedelta(days=3 + index),
-                defaults={
-                    "leave_type": LeaveRequest.LeaveType.VACATION,
-                    "reason": f"Scheduled leave for {employee.get_full_name() or employee.username}",
-                    "status": LeaveRequest.Status.PENDING,
-                    "approver": None,
-                    "manager_comment": "",
-                    "approved_at": None,
-                },
-            )
-
-        self.stdout.write(self.style.SUCCESS("Demo data created or updated successfully."))
+        self.stdout.write(self.style.SUCCESS("Accounts synced successfully. Attendance and leave records were cleared."))
         self.stdout.write("@admin / Admin@123 (manager)")
         for employee, password in seeded_employees:
             self.stdout.write(f"{employee.username} / {password} (employee)")
