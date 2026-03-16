@@ -5,6 +5,8 @@ const userMetaNode = document.getElementById("user-meta");
 const leaveForm = document.getElementById("leave-form");
 const leaveFormContainer = document.getElementById("leave-form-container");
 const leaveRoleNote = document.getElementById("leave-role-note");
+const attendanceEmployeeHeader = document.getElementById("attendance-employee-header");
+const attendanceActions = document.querySelector(".actions");
 
 let currentUser = null;
 
@@ -46,14 +48,20 @@ function statusTag(status) {
 }
 
 function renderAttendance(rows) {
+    const isAdmin = currentUser?.role === "manager";
+    if (attendanceEmployeeHeader) {
+        attendanceEmployeeHeader.hidden = !isAdmin;
+    }
+
     if (!rows.length) {
-        attendanceRows.innerHTML = "<tr><td colspan='4'>No attendance records yet.</td></tr>";
+        attendanceRows.innerHTML = `<tr><td colspan='${isAdmin ? 5 : 4}'>No attendance records yet.</td></tr>`;
         return;
     }
     attendanceRows.innerHTML = rows
         .map(
             (row) => `
             <tr>
+                ${isAdmin ? `<td>${row.employee_name || row.employee || "N/A"}</td>` : ""}
                 <td>${row.date}</td>
                 <td>${formatDateTime(row.time_in)}</td>
                 <td>${formatDateTime(row.time_out)}</td>
@@ -96,6 +104,13 @@ function renderLeaves(rows) {
         .join("");
 }
 
+function updateAttendanceSection() {
+    const isAdmin = currentUser?.role === "manager";
+    if (attendanceActions) {
+        attendanceActions.hidden = isAdmin;
+    }
+}
+
 function updateLeaveSection() {
     const isAdmin = currentUser?.role === "manager";
     if (leaveRoleNote) {
@@ -111,6 +126,7 @@ function updateLeaveSection() {
 async function loadProfile() {
     currentUser = await api("/api/accounts/me/");
     userMetaNode.textContent = `${currentUser.first_name || currentUser.username} - ${(currentUser.role_label || currentUser.role).toUpperCase()} | ${currentUser.department || "No department"}`;
+    updateAttendanceSection();
     updateLeaveSection();
 }
 
@@ -120,7 +136,9 @@ async function loadAttendance() {
         api("/api/attendance/summary/"),
     ]);
     renderAttendance(records);
-    summaryNode.textContent = `This month: ${summary.days_logged} day(s) logged, ${summary.total_hours} total hour(s).`;
+    summaryNode.textContent = currentUser?.role === "manager"
+        ? `This month: ${summary.days_logged} attendance record(s) logged across employees, ${summary.total_hours} total hour(s).`
+        : `This month: ${summary.days_logged} day(s) logged, ${summary.total_hours} total hour(s).`;
 }
 
 async function loadLeaves() {

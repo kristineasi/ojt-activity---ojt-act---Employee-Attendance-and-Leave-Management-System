@@ -40,7 +40,7 @@ class TimeOutAPIView(APIView):
 
 class MyAttendanceAPIView(APIView):
     def get(self, request):
-        queryset = AttendanceRecord.objects.filter(employee=request.user)
+        queryset = AttendanceRecord.objects.all() if request.user.role == "manager" else AttendanceRecord.objects.filter(employee=request.user)
         serializer = AttendanceRecordSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -59,7 +59,10 @@ class AttendanceSummaryAPIView(APIView):
         if year < 1900 or year > 9999:
             return Response({"detail": "Year is out of supported range."}, status=status.HTTP_400_BAD_REQUEST)
 
-        records = AttendanceRecord.objects.filter(employee=request.user, date__month=month, date__year=year)
+        records = AttendanceRecord.objects.filter(date__month=month, date__year=year)
+        if request.user.role != "manager":
+            records = records.filter(employee=request.user)
+
         total_hours = records.aggregate(total=Sum("worked_hours"))["total"] or Decimal("0.00")
         return Response(
             {
