@@ -3,6 +3,8 @@ const leaveRows = document.getElementById("leave-rows");
 const summaryNode = document.getElementById("attendance-summary");
 const userMetaNode = document.getElementById("user-meta");
 const leaveForm = document.getElementById("leave-form");
+const leaveFormContainer = document.getElementById("leave-form-container");
+const leaveRoleNote = document.getElementById("leave-role-note");
 
 let currentUser = null;
 
@@ -68,11 +70,11 @@ function renderLeaves(rows) {
         return;
     }
 
-    const isManager = currentUser?.role === "manager";
+    const isAdmin = currentUser?.role === "manager";
     leaveRows.innerHTML = rows
         .map((row) => {
-            const managerButtons =
-                isManager && row.status === "pending"
+            const adminButtons =
+                isAdmin && row.status === "pending"
                     ? `
                 <div class="inline-actions">
                     <button onclick="decideLeave(${row.id}, 'approve')">Approve</button>
@@ -87,16 +89,29 @@ function renderLeaves(rows) {
                     <td>${row.leave_type}</td>
                     <td>${row.start_date} to ${row.end_date}</td>
                     <td>${statusTag(row.status)}</td>
-                    <td>${managerButtons}</td>
+                    <td>${adminButtons}</td>
                 </tr>
             `;
         })
         .join("");
 }
 
+function updateLeaveSection() {
+    const isAdmin = currentUser?.role === "manager";
+    if (leaveRoleNote) {
+        leaveRoleNote.textContent = isAdmin
+            ? "Admin accounts review and approve leave requests. Only employees can file leave requests."
+            : "Submit your leave request below. Admin will review it once submitted.";
+    }
+    if (leaveFormContainer) {
+        leaveFormContainer.hidden = isAdmin;
+    }
+}
+
 async function loadProfile() {
     currentUser = await api("/api/accounts/me/");
-    userMetaNode.textContent = `${currentUser.first_name || currentUser.username} - ${currentUser.role.toUpperCase()} | ${currentUser.department || "No department"}`;
+    userMetaNode.textContent = `${currentUser.first_name || currentUser.username} - ${(currentUser.role_label || currentUser.role).toUpperCase()} | ${currentUser.department || "No department"}`;
+    updateLeaveSection();
 }
 
 async function loadAttendance() {
@@ -158,7 +173,7 @@ leaveForm?.addEventListener("submit", async (event) => {
 });
 
 async function decideLeave(id, action) {
-    const comment = prompt(`Manager comment for ${action}:`) || "";
+    const comment = prompt(`Admin comment for ${action}:`) || "";
     try {
         await api(`/api/leaves/requests/${id}/${action}/`, {
             method: "PATCH",

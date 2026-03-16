@@ -15,6 +15,9 @@ class LeaveRequestListCreateAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        if request.user.role != "employee":
+            return Response({"detail": "Only employees can file leave requests."}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = LeaveRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         leave_request = serializer.save(employee=request.user)

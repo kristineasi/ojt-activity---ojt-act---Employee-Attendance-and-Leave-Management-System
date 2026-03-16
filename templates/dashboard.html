@@ -38,19 +38,22 @@
 
         <section class="panel">
             <h2>Leave Requests</h2>
-            <form id="leave-form" class="leave-form">
-                <select name="leave_type" required>
-                    <option value="">Leave Type</option>
-                    <option value="vacation">Vacation</option>
-                    <option value="sick">Sick</option>
-                    <option value="emergency">Emergency</option>
-                    <option value="unpaid">Unpaid</option>
-                </select>
-                <input type="date" name="start_date" required>
-                <input type="date" name="end_date" required>
-                <textarea name="reason" rows="2" placeholder="Reason" required></textarea>
-                <button type="submit">File Leave</button>
-            </form>
+            <p id="leave-role-note" class="summary"></p>
+            <div id="leave-form-container">
+                <form id="leave-form" class="leave-form">
+                    <select name="leave_type" required>
+                        <option value="">Leave Type</option>
+                        <option value="vacation">Vacation</option>
+                        <option value="sick">Sick</option>
+                        <option value="emergency">Emergency</option>
+                        <option value="unpaid">Unpaid</option>
+                    </select>
+                    <input type="date" name="start_date" required>
+                    <input type="date" name="end_date" required>
+                    <textarea name="reason" rows="2" placeholder="Reason" required></textarea>
+                    <button type="submit">File Leave</button>
+                </form>
+            </div>
 
             <div class="table-wrap">
                 <table>

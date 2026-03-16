@@ -5,9 +5,14 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role_label = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email", "department", "role"]
+        fields = ["id", "username", "first_name", "last_name", "email", "department", "role", "role_label"]
+
+    def get_role_label(self, obj):
+        return "Admin" if obj.role == User.Role.MANAGER else "Employee"
 
 
 class RegisterSerializer(serializers.ModelSerializer):
