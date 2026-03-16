@@ -3,8 +3,10 @@
 {% block content %}
 <div class="app-shell">
     <header class="topbar">
-        <div>
+        <div class="topbar-copy">
+            <div class="eyebrow">BlueShift Workspace</div>
             <h1>WorkPulse Dashboard</h1>
+            <p class="utility-text">Track attendance, review leave activity, and manage daily workforce actions from one focused workspace.</p>
             <p id="user-meta">Loading profile...</p>
         </div>
         <form method="post" action="/logout/">
@@ -15,7 +17,13 @@
 
     <main class="dashboard-grid">
         <section class="panel">
-            <h2>Attendance</h2>
+            <div class="section-heading">
+                <div>
+                    <h2>Attendance</h2>
+                    <p>Record time-in and time-out events, then review your running monthly work-hour summary below.</p>
+                </div>
+                <div class="section-icon">AT</div>
+            </div>
             <div class="actions">
                 <button id="time-in-btn">Time In</button>
                 <button id="time-out-btn" class="secondary">Time Out</button>
@@ -37,7 +45,13 @@
         </section>
 
         <section class="panel">
-            <h2>Leave Requests</h2>
+            <div class="section-heading">
+                <div>
+                    <h2>Leave Requests</h2>
+                    <p>Employees can submit requests here, while admin can review the current leave pipeline in real time.</p>
+                </div>
+                <div class="section-icon">LV</div>
+            </div>
             <p id="leave-role-note" class="summary"></p>
             <div id="leave-form-container">
                 <form id="leave-form" class="leave-form">
