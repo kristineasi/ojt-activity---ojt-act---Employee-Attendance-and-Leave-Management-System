@@ -85,6 +85,26 @@
                 </table>
             </div>
         </section>
+
+        <section class="panel" id="employee-account-panel" hidden>
+            <div class="section-heading">
+                <div>
+                    <h2>Create Employee Account</h2>
+                    <p>Create employee login accounts directly in the app. These accounts are saved in the same database immediately.</p>
+                </div>
+                <div class="section-icon">AC</div>
+            </div>
+            <p id="employee-account-note" class="summary"></p>
+            <form id="employee-account-form" class="leave-form">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" minlength="8" required>
+                <input type="text" name="first_name" placeholder="First name" required>
+                <input type="text" name="last_name" placeholder="Last name" required>
+                <input type="email" name="email" placeholder="Email (optional)">
+                <input type="text" name="department" placeholder="Department (optional)">
+                <button type="submit">Create Employee Account</button>
+            </form>
+        </section>
     </main>
 </div>
 <script src="/static/js/dashboard.js"></script>

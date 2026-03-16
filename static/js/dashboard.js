@@ -7,6 +7,9 @@ const leaveFormContainer = document.getElementById("leave-form-container");
 const leaveRoleNote = document.getElementById("leave-role-note");
 const attendanceEmployeeHeader = document.getElementById("attendance-employee-header");
 const attendanceActions = document.querySelector(".actions");
+const employeeAccountPanel = document.getElementById("employee-account-panel");
+const employeeAccountForm = document.getElementById("employee-account-form");
+const employeeAccountNote = document.getElementById("employee-account-note");
 
 let currentUser = null;
 
@@ -123,11 +126,24 @@ function updateLeaveSection() {
     }
 }
 
+function updateEmployeeAccountSection() {
+    const isAdmin = currentUser?.role === "manager";
+    if (employeeAccountPanel) {
+        employeeAccountPanel.hidden = !isAdmin;
+    }
+    if (employeeAccountNote) {
+        employeeAccountNote.textContent = isAdmin
+            ? "Use this form to create employee login accounts directly in the app."
+            : "";
+    }
+}
+
 async function loadProfile() {
     currentUser = await api("/api/accounts/me/");
     userMetaNode.textContent = `${currentUser.first_name || currentUser.username} - ${(currentUser.role_label || currentUser.role).toUpperCase()} | ${currentUser.department || "No department"}`;
     updateAttendanceSection();
     updateLeaveSection();
+    updateEmployeeAccountSection();
 }
 
 async function loadAttendance() {
@@ -185,6 +201,30 @@ leaveForm?.addEventListener("submit", async (event) => {
         });
         leaveForm.reset();
         await loadLeaves();
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+employeeAccountForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(employeeAccountForm);
+    const payload = Object.fromEntries(formData.entries());
+
+    if (!payload.email) {
+        delete payload.email;
+    }
+    if (!payload.department) {
+        delete payload.department;
+    }
+
+    try {
+        await api("/api/accounts/employees/create/", {
+            method: "POST",
+            body: JSON.stringify(payload),
+        });
+        employeeAccountForm.reset();
+        alert("Employee account created successfully.");
     } catch (error) {
         alert(error.message);
     }

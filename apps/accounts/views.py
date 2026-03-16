@@ -5,7 +5,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import RegisterSerializer, UserSerializer
+from .permissions import IsManager
+from .serializers import EmployeeAccountCreateSerializer, RegisterSerializer, UserSerializer
 
 
 class RegisterAPIView(APIView):
@@ -44,3 +45,13 @@ class LogoutAPIView(APIView):
 class MeAPIView(APIView):
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+
+
+class EmployeeAccountCreateAPIView(APIView):
+    permission_classes = [IsManager]
+
+    def post(self, request):
+        serializer = EmployeeAccountCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        employee = serializer.save()
+        return Response(UserSerializer(employee).data, status=status.HTTP_201_CREATED)
