@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .permissions import IsManager
-from .serializers import EmployeeAccountCreateSerializer, RegisterSerializer, UserSerializer
+from .serializers import EmployeeAccountCreateSerializer, ProfileUpdateSerializer, RegisterSerializer, UserSerializer
 
 
 class RegisterAPIView(APIView):
@@ -45,6 +45,16 @@ class LogoutAPIView(APIView):
 class MeAPIView(APIView):
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+
+
+class MeUpdateAPIView(APIView):
+    def patch(self, request):
+        serializer = ProfileUpdateSerializer(instance=request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        if request.data.get("password"):
+            login(request, user)
+        return Response(UserSerializer(user).data)
 
 
 class EmployeeAccountCreateAPIView(APIView):

@@ -40,3 +40,26 @@ class EmployeeAccountCreateSerializer(serializers.ModelSerializer):
             is_staff=False,
             is_superuser=False,
         )
+
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True, min_length=8)
+
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email", "department", "password"]
+
+    def validate_username(self, value):
+        user = self.instance
+        if User.objects.exclude(pk=user.pk).filter(username=value).exists():
+            raise serializers.ValidationError("This username is already in use.")
+        return value
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", "")
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance

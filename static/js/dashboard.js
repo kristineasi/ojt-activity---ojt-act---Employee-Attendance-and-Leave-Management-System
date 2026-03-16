@@ -12,6 +12,8 @@ const employeeAccountForm = document.getElementById("employee-account-form");
 const employeeAccountNote = document.getElementById("employee-account-note");
 const salarySummaryNode = document.getElementById("salary-summary");
 const salaryRows = document.getElementById("salary-rows");
+const profileForm = document.getElementById("profile-form");
+const profileNote = document.getElementById("profile-note");
 
 let currentUser = null;
 
@@ -145,12 +147,33 @@ function updateEmployeeAccountSection() {
     }
 }
 
+function updateProfileSection() {
+    if (profileNote) {
+        profileNote.textContent = "Update your basic details anytime. Leave password blank if you do not want to change it.";
+    }
+}
+
+function hydrateProfileForm() {
+    if (!profileForm || !currentUser) {
+        return;
+    }
+
+    profileForm.elements.username.value = currentUser.username || "";
+    profileForm.elements.first_name.value = currentUser.first_name || "";
+    profileForm.elements.last_name.value = currentUser.last_name || "";
+    profileForm.elements.email.value = currentUser.email || "";
+    profileForm.elements.department.value = currentUser.department || "";
+    profileForm.elements.password.value = "";
+}
+
 async function loadProfile() {
     currentUser = await api("/api/accounts/me/");
     userMetaNode.textContent = `${currentUser.first_name || currentUser.username} - ${(currentUser.role_label || currentUser.role).toUpperCase()} | ${currentUser.department || "No department"}`;
     updateAttendanceSection();
     updateLeaveSection();
     updateEmployeeAccountSection();
+    updateProfileSection();
+    hydrateProfileForm();
 }
 
 async function loadAttendance() {
@@ -274,6 +297,35 @@ employeeAccountForm?.addEventListener("submit", async (event) => {
         employeeAccountForm.reset();
         alert("Employee account created successfully.");
         await loadSalarySummary();
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+profileForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(profileForm);
+    const payload = Object.fromEntries(formData.entries());
+
+    if (!payload.email) {
+        delete payload.email;
+    }
+    if (!payload.department) {
+        payload.department = "";
+    }
+    if (!payload.password) {
+        delete payload.password;
+    }
+
+    try {
+        const updated = await api("/api/accounts/me/update/", {
+            method: "PATCH",
+            body: JSON.stringify(payload),
+        });
+        currentUser = updated;
+        userMetaNode.textContent = `${currentUser.first_name || currentUser.username} - ${(currentUser.role_label || currentUser.role).toUpperCase()} | ${currentUser.department || "No department"}`;
+        hydrateProfileForm();
+        alert("Profile updated successfully.");
     } catch (error) {
         alert(error.message);
     }
